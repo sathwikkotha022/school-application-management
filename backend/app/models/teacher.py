@@ -11,3 +11,4 @@ class Teacher(Base):
     subject = Column(String(100))
 
     user = relationship("User", back_populates="teacher")
+    attendance_records = relationship("Attendance", back_populates="teacher")

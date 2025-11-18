@@ -11,3 +11,4 @@ class Student(Base):
     grade = Column(String(50))
 
     user = relationship("User", back_populates="student")
+    attendance_records = relationship("Attendance", back_populates="student")

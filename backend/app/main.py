@@ -3,8 +3,8 @@ from sqlalchemy.orm import Session
 from sqlalchemy import text   # <-- ADD THIS
 
 from app.api.auth.router import router as auth_router
-from app.database import Base, engine, get_db   # <-- FIXED import
-from app.models import user, teacher, student   # <-- Models imported once
+from app.database import Base, engine, get_db 
+from app.models import user, teacher, student, attendance 
 
 # Create tables at startup
 Base.metadata.create_all(bind=engine)
