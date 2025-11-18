@@ -1,4 +1,4 @@
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     # Database
@@ -8,6 +8,9 @@ class Settings(BaseSettings):
     DB_PORT: int = 3306
     DB_NAME: str = "school_db"
     
+    DATABASE_URL: str | None = None 
+    DEBUG: bool = False  
+
     # JWT settings
     SECRET_KEY: str = "Sathwik05"
     ALGORITHM: str = "HS256"
