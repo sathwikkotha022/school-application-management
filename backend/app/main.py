@@ -6,7 +6,8 @@ from app.api.auth.router import router as auth_router
 from app.database import Base, engine, get_db 
 from app.models import user, teacher, student, attendance 
 
-# Create tables at startup
+# Create tables at startup (drop existing to ensure schema is up to date)
+Base.metadata.drop_all(bind=engine)
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="School Management Backend")
