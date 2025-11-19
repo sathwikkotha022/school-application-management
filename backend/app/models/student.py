@@ -1,3 +1,4 @@
+# app/models/student.py
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 from app.database import Base
@@ -11,4 +12,5 @@ class Student(Base):
     grade = Column(String(50))
 
     user = relationship("User", back_populates="student")
-    attendance_records = relationship("Attendance", back_populates="student")
+    # now points to StudentAttendance table
+    attendance_records = relationship("StudentAttendance", back_populates="student", cascade="all, delete-orphan")

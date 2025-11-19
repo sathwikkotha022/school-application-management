@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from pydantic import BaseModel
 
 from app.database import get_db
 from app.models.user import User
@@ -7,10 +8,7 @@ from app.models.teacher import Teacher
 from app.models.student import Student
 from app.core.security import hash_password, verify_password, create_access_token
 
-from pydantic import BaseModel
-
-router = APIRouter(prefix="/auth", tags=["Auth"])
-
+router = APIRouter(tags=["Auth"])
 
 # =====================
 # 📌 SCHEMAS
@@ -48,24 +46,23 @@ class Login(BaseModel):
 @router.post("/register/teacher")
 def register_teacher(data: RegisterTeacher, db: Session = Depends(get_db)):
 
-    # Check if email is taken
     if db.query(User).filter(User.email == data.email).first():
         raise HTTPException(status_code=400, detail="Email already registered")
 
-    # Create user first
+    # Create User entry
     user = User(
         username=data.username,
         email=data.email,
         password_hash=hash_password(data.password),
         first_name=data.first_name,
         last_name=data.last_name,
-        role="teacher"
+        role="teacher",
     )
     db.add(user)
     db.commit()
     db.refresh(user)
 
-    # Create teacher linked to user
+    # Create Teacher entry
     teacher = Teacher(
         user_id=user.id,
         name=data.name,
@@ -75,6 +72,7 @@ def register_teacher(data: RegisterTeacher, db: Session = Depends(get_db)):
     db.commit()
 
     return {"message": "Teacher registered successfully", "teacher_id": teacher.id}
+
 
 # =============================
 # 📌 REGISTER STUDENT
@@ -86,20 +84,20 @@ def register_student(data: RegisterStudent, db: Session = Depends(get_db)):
     if db.query(User).filter(User.email == data.email).first():
         raise HTTPException(status_code=400, detail="Email already registered")
 
-    # Create user
+    # Create User entry
     user = User(
         username=data.username,
         email=data.email,
         password_hash=hash_password(data.password),
         first_name=data.first_name,
         last_name=data.last_name,
-        role="student"
+        role="student",
     )
     db.add(user)
     db.commit()
     db.refresh(user)
 
-    # Create student linked to user
+    # Create Student entry
     student = Student(
         user_id=user.id,
         name=data.name,
@@ -110,11 +108,15 @@ def register_student(data: RegisterStudent, db: Session = Depends(get_db)):
 
     return {"message": "Student registered successfully", "student_id": student.id}
 
-#login
+
+# =============================
+# 📌 LOGIN
+# =============================
+
 @router.post("/login")
 def login(data: Login, db: Session = Depends(get_db)):
 
-    # Find user by email
+    # Find user
     user = db.query(User).filter(User.email == data.email).first()
     if not user:
         raise HTTPException(status_code=400, detail="Invalid email or password")
@@ -123,7 +125,7 @@ def login(data: Login, db: Session = Depends(get_db)):
     if not verify_password(data.password, user.password_hash):
         raise HTTPException(status_code=400, detail="Invalid email or password")
 
-    # Generate JWT token
+    # Create JWT token
     token = create_access_token({"user_id": user.id, "role": user.role})
 
     return {
@@ -135,6 +137,6 @@ def login(data: Login, db: Session = Depends(get_db)):
             "email": user.email,
             "role": user.role,
             "first_name": user.first_name,
-            "last_name": user.last_name
-        }
+            "last_name": user.last_name,
+        },
     }
