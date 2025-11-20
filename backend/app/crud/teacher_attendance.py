@@ -6,25 +6,25 @@ from typing import Optional
 from app import models
 from app.schemas import teacher_attendance as schemas
 
-def create_teacher_login(db: Session, teacher_id: int, date_value: date, login_time: Optional[datetime] = None):
-    if login_time is None:
-        login_time = datetime.utcnow()
-    db_obj = models.TeacherAttendance(
+def create_teacher_login(db, teacher_id, date, login_time=None):
+    from app.models import TeacherAttendance
+    
+    ta = TeacherAttendance(
         teacher_id=teacher_id,
-        date=date_value,
-        login_time=login_time
+        date=date,
+        login_time=login_time or datetime.utcnow(),  # FULL DATETIME ✔
     )
-    db.add(db_obj)
+    db.add(ta)
     db.commit()
-    db.refresh(db_obj)
-    return db_obj
+    db.refresh(ta)
+    return ta
 
 def end_teacher_shift(db: Session, attendance_id: int, logout_time: Optional[datetime] = None):
     obj = db.query(models.TeacherAttendance).filter(models.TeacherAttendance.id == attendance_id).first()
     if not obj:
         return None
     if logout_time is None:
-        logout_time = datetime.utcnow()
+        logout_time=datetime.utcnow()
     obj.logout_time = logout_time
     # optional: compute total_hours as a simple string difference (you can compute float hours later)
     try:
