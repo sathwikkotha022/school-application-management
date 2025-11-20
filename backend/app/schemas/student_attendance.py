@@ -1,5 +1,5 @@
 # app/schemas/student_attendance.py
-from datetime import date
+from datetime import datetime,date
 from pydantic import BaseModel
 from typing import Optional
 
@@ -21,7 +21,7 @@ class StudentAttendanceUpdate(BaseModel):
 
 class StudentAttendanceOut(StudentAttendanceBase):
     id: int
-    created_at: Optional[str]
+    created_at: Optional[datetime]
 
     model_config = {"from_attributes": True}
 

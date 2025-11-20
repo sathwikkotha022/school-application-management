@@ -18,7 +18,7 @@ router = APIRouter(tags=["Teacher Attendance"])
 # Helper to ensure teacher role
 # --------------------------
 def ensure_teacher(user: models.User):
-    if user.role != "teacher" or not user.teacher:
+    if user.role not in ["teacher", "admin"] or not user.teacher:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Teacher credentials required"
