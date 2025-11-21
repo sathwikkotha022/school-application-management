@@ -1,25 +1,28 @@
-# app/schemas/teacher_attendance.py
-from datetime import datetime, date
 from pydantic import BaseModel
+from datetime import datetime, date
 from typing import Optional
+
 
 class TeacherAttendanceBase(BaseModel):
     teacher_id: int
     date: date
 
-class TeacherAttendanceCreate(BaseModel):
+
+class TeacherAttendanceLogin(TeacherAttendanceBase):
+    login_time: Optional[datetime] = None
+
+
+class TeacherAttendanceLogout(BaseModel):
+    logout_time: Optional[datetime] = None
+
+
+class TeacherAttendanceOut(BaseModel):
+    id: int
     teacher_id: int
     date: date
     login_time: Optional[datetime] = None
     logout_time: Optional[datetime] = None
-    remarks: Optional[str] = None
+    total_hours: Optional[str] = None
 
-class TeacherAttendanceOut(TeacherAttendanceBase):
-    id: int
-    login_time: Optional[datetime]
-    logout_time: Optional[datetime]
-    total_hours: Optional[str]
-    created_at: Optional[datetime]
-
-    model_config = {"from_attributes": True}
-
+    class Config:
+        orm_mode = True

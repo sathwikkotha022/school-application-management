@@ -1,19 +1,17 @@
+# app/api/router.py
 from fastapi import APIRouter
 
-# Auth router
+# Import sub-routers
+from app.api.admin.router import router as admin_router
 from app.api.auth.router import router as auth_router
+from app.api.student.router import router as student_router
+from app.api.teacher.router import router as teacher_router
 
-# Attendance routers
-from app.api.student.attendance import router as student_attendance_router
-from app.api.teacher.attendance import router as teacher_attendance_router
-
-# Admin router
-from app.api.admin.users import router as admin_users_router
-
-
+# Main API router
 router = APIRouter()
 
-router.include_router(auth_router, prefix="/auth")
-router.include_router(student_attendance_router, prefix="/student-attendance")
-router.include_router(teacher_attendance_router, prefix="/teacher-attendance")
-router.include_router(admin_users_router, prefix="/admin")
+# Include all sub-routers with prefixes
+router.include_router(auth_router, prefix="/auth", tags=["Auth"])
+router.include_router(admin_router, prefix="/admin", tags=["Admin"])
+router.include_router(student_router, prefix="/student", tags=["Student"])
+router.include_router(teacher_router, prefix="/teacher", tags=["Teacher"])

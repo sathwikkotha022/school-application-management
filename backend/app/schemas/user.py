@@ -1,49 +1,32 @@
 from pydantic import BaseModel, EmailStr
 from typing import Optional
 
-# ---------------------------------------------------------
-# Base User schema (shared attributes)
-# ---------------------------------------------------------
+
+# ========== Base ==========
 class UserBase(BaseModel):
+    username: str
     email: EmailStr
-    full_name: Optional[str] = None
-    is_active: bool = True
-    role: Optional[str] = None   # admin, teacher, student
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    role: Optional[str] = "student"
+    is_active: Optional[bool] = True
 
 
-# ---------------------------------------------------------
-# Schema for creating a user
-# ---------------------------------------------------------
+# ========== Create ==========
 class UserCreate(UserBase):
     password: str
 
 
-# ---------------------------------------------------------
-# Schema for updating a user
-# ---------------------------------------------------------
+# ========== Update ==========
 class UserUpdate(BaseModel):
-    full_name: Optional[str] = None
+    email: Optional[EmailStr] = None
     password: Optional[str] = None
     is_active: Optional[bool] = None
-    role: Optional[str] = None
 
 
-# ---------------------------------------------------------
-# Schema returned to client (THIS IS THE MISSING ONE)
-# ---------------------------------------------------------
+# ========== Output ==========
 class UserOut(UserBase):
     id: int
 
-    model_config = {"from_attributes": True}
-
-
-
-# ---------------------------------------------------------
-# Schema with password hash (internal only)
-# ---------------------------------------------------------
-class UserInDB(UserBase):
-    id: int
-    hashed_password: str
-
-    model_config = {"from_attributes": True}
-
+    class Config:
+        orm_mode = True

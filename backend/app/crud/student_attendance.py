@@ -7,7 +7,7 @@ from app import models
 from app.schemas import student_attendance as schemas
 
 def create_student_attendance(db: Session, attendance_in: schemas.StudentAttendanceCreate):
-    # prevent duplicate entry for same student/date/period
+    # avoid duplicates for same student/date/period
     existing = db.query(models.StudentAttendance).filter(
         models.StudentAttendance.student_id == attendance_in.student_id,
         models.StudentAttendance.date == attendance_in.date,
@@ -38,6 +38,7 @@ def update_student_attendance(db: Session, attendance_id: int, updates: schemas.
         obj.status = updates.status
     if updates.remarks is not None:
         obj.remarks = updates.remarks
+    db.add(obj)
     db.commit()
     db.refresh(obj)
     return obj
