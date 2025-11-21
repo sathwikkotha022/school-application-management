@@ -1,12 +1,10 @@
 from fastapi import FastAPI
-from app.database import Base, engine
-from app.api.router import api_router
-
-Base.metadata.create_all(bind=engine)
+from app.api.auth.router import router as auth_router
 
 app = FastAPI(title="School Management Backend")
 
-app.include_router(api_router)
+# include routers
+app.include_router(auth_router)
 
 @app.get("/")
 def root():
