@@ -8,7 +8,7 @@ from app import models
 from app.core.security import get_current_active_user
 from app.schemas import user as user_schemas  # assuming you already have this
 
-router = APIRouter(prefix="/admin", tags=["admin"])
+router = APIRouter(tags=["admin"])
 
 def ensure_admin(user: models.User):
     if user.role != "admin":
