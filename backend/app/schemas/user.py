@@ -1,19 +1,32 @@
 from pydantic import BaseModel, EmailStr
+from typing import Optional
 
-class LoginRequest(BaseModel):
-    email: str
+
+# ========== Base ==========
+class UserBase(BaseModel):
+    username: str
+    email: EmailStr
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    role: Optional[str] = "student"
+    is_active: Optional[bool] = True
+
+
+# ========== Create ==========
+class UserCreate(UserBase):
     password: str
 
-class UserResponse(BaseModel):
+
+# ========== Update ==========
+class UserUpdate(BaseModel):
+    email: Optional[EmailStr] = None
+    password: Optional[str] = None
+    is_active: Optional[bool] = None
+
+
+# ========== Output ==========
+class UserOut(UserBase):
     id: int
-    email: str
-    full_name: str
-    role: str
-    is_active: bool
 
-    model_config = {"from_attributes": True}
-
-class Token(BaseModel):
-    access_token: str
-    user: UserResponse
-
+    class Config:
+        orm_mode = True

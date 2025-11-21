@@ -1,12 +1,22 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
-from dotenv import load_dotenv
-import os
+from app.core.config import settings
 
-load_dotenv()
+# Construct the database URL if not provided
+if settings.DATABASE_URL:
+    SQLALCHEMY_DATABASE_URL = settings.DATABASE_URL
+else:
+    SQLALCHEMY_DATABASE_URL = f"mysql+pymysql://{settings.DB_USER}:{settings.DB_PASSWORD}@{settings.DB_HOST}:{settings.DB_PORT}/{settings.DB_NAME}"
 
-DATABASE_URL = os.getenv("DATABASE_URL")
+engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
-engine = create_engine(DATABASE_URL, echo=True)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
 Base = declarative_base()
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
