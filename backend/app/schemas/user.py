@@ -1,8 +1,7 @@
+# app/schemas/user.py
 from pydantic import BaseModel, EmailStr
 from typing import Optional
 
-
-# ========== Base ==========
 class UserBase(BaseModel):
     username: str
     email: EmailStr
@@ -11,22 +10,11 @@ class UserBase(BaseModel):
     role: Optional[str] = "student"
     is_active: Optional[bool] = True
 
+    class Config:
+        from_attributes = True
 
-# ========== Create ==========
 class UserCreate(UserBase):
     password: str
 
-
-# ========== Update ==========
-class UserUpdate(BaseModel):
-    email: Optional[EmailStr] = None
-    password: Optional[str] = None
-    is_active: Optional[bool] = None
-
-
-# ========== Output ==========
 class UserOut(UserBase):
     id: int
-
-    class Config:
-        orm_mode = True

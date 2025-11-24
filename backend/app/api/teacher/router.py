@@ -1,16 +1,20 @@
-from fastapi import APIRouter, Depends
+# app/api/teacher/router.py
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.database import get_db
-from app.schemas.marks import MarkOut, MarkCreate
-from app.crud.marks import add_mark, get_teacher_marks
-from app.api.auth.router import get_current_user
+from app.core.security import get_current_user, get_current_teacher
+from app.crud import teacher as crud_teacher
+from app.schemas.teacher import TeacherOut, TeacherCreate
 
-router = APIRouter(tags=["Teacher"])
+router = APIRouter()
 
-@router.post("/marks", response_model=MarkOut)
-def create_mark(mark: MarkCreate, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
-    return add_mark(db, mark, current_user.id)
+@router.get("/me", response_model=TeacherOut)
+def me(current_user = Depends(get_current_user), db: Session = Depends(get_db)):
+    t = crud_teacher.get_teacher_by_user_id(db, current_user.id)
+    if not t:
+        raise HTTPException(status_code=404, detail="Teacher profile not found")
+    return t
 
-@router.get("/marks", response_model=list[MarkOut])
-def my_marks(db: Session = Depends(get_db), current_user = Depends(get_current_user)):
-    return get_teacher_marks(db, current_user.id)
+@router.post("/", response_model=TeacherOut)
+def create_teacher(payload: TeacherCreate, db: Session = Depends(get_db)):
+    return crud_teacher.create_teacher(db, payload)

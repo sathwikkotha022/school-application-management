@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, ForeignKey, TIMESTAMP, text
+# app/models/teacher_subject.py
+from sqlalchemy import Column, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 from app.database import Base
 
@@ -8,11 +9,8 @@ class TeacherSubject(Base):
     id = Column(Integer, primary_key=True, index=True)
     teacher_id = Column(Integer, ForeignKey("teachers.id"), nullable=False)
     subject_id = Column(Integer, ForeignKey("subjects.id"), nullable=False)
-    class_id = Column(Integer, ForeignKey("classes.id"), nullable=True)  # optional
-    section_id = Column(Integer, ForeignKey("sections.id"), nullable=True)  # optional
-    created_at = Column(TIMESTAMP, server_default=text("CURRENT_TIMESTAMP"))
+    class_id = Column(Integer, ForeignKey("school_classes.id"), nullable=True)
+    section_id = Column(Integer, ForeignKey("sections.id"), nullable=True)
 
-    teacher = relationship("Teacher")
-    subject = relationship("Subject")
-    school_class = relationship("SchoolClass")
-    section = relationship("Section")
+    teacher = relationship("Teacher", back_populates="teacher_subjects")
+    subject = relationship("Subject", back_populates="teacher_subjects")

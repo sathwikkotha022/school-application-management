@@ -1,13 +1,12 @@
-from fastapi import APIRouter, Depends
+# app/api/admin/router.py
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.database import get_db
-from app.schemas.user import UserOut
-from app.crud.user import get_all_users
-from app.api.auth.router import get_current_user  # <- use the correct function
+from app.core.security import get_current_admin
+from app.crud import user as crud_user, student as crud_student, teacher as crud_teacher
 
-router = APIRouter(tags=["Admin"])
+router = APIRouter()
 
-@router.get("/users", response_model=list[UserOut])
-def list_users(db: Session = Depends(get_db), current_user = Depends(get_current_user)):
-    # Optional: add role check here
-    return get_all_users(db)
+@router.get("/users")
+def list_users(db: Session = Depends(get_db), current_admin = Depends(get_current_admin)):
+    return crud_user.get_all_users(db)

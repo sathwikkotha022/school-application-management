@@ -10,3 +10,4 @@ from .subject import Subject
 from .exam import Exam
 from .teacher_subject import TeacherSubject
 from .marks import Mark
+from .teacher_classes import TeacherClass
