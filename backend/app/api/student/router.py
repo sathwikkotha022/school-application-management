@@ -1,22 +1,37 @@
-# app/api/student/router.py
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.database import get_db
-from app.core.security import get_current_user, get_current_student
-from app.crud import student as crud_student
-from app.schemas.student import StudentOut, StudentCreate
+from app.schemas.student import StudentCreate, StudentOut
+from app.crud.student import create_student
+from app.crud.user import create_user
+from app.core.hashing import Hasher  # If you use hashing
 
 router = APIRouter()
 
-@router.get("/me", response_model=StudentOut)
-def me(current_user = Depends(get_current_user), db: Session = Depends(get_db)):
-    student = crud_student.get_student_by_user_id(db, current_user.id)
-    if not student:
-        raise HTTPException(status_code=404, detail="Student profile not found")
-    return student
 
 @router.post("/", response_model=StudentOut)
-def create_student(payload: StudentCreate, db: Session = Depends(get_db), current_admin = Depends(get_current_student)):
-    # you might only allow admin to create students - adjust as needed
-    s = crud_student.create_student(db, user_id=payload.user_id, roll_number=payload.roll_number, class_id=payload.class_id, section_id=payload.section_id)
-    return s
+def create_student_with_user(payload: StudentCreate, db: Session = Depends(get_db)):
+
+    # 1. Create User
+    password_hash = Hasher.get_password_hash(payload.user.password)
+
+    user = create_user(
+        db=db,
+        username=payload.user.username,
+        email=payload.user.email,
+        password_hash=password_hash,
+        first_name=payload.user.first_name,
+        last_name=payload.user.last_name,
+        role="student"
+    )
+
+    # 2. Create Student
+    student = create_student(
+        db=db,
+        user_id=user.id,
+        roll_number=payload.roll_number,
+        class_id=payload.class_id,
+        section_id=payload.section_id
+    )
+
+    return student

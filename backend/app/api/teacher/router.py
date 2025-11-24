@@ -1,20 +1,37 @@
-# app/api/teacher/router.py
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.database import get_db
-from app.core.security import get_current_user, get_current_teacher
-from app.crud import teacher as crud_teacher
-from app.schemas.teacher import TeacherOut, TeacherCreate
+from app.schemas.teacher import TeacherCreate, TeacherOut
+from app.crud.teacher import create_teacher
+from app.crud.user import create_user
+from app.core.hashing import Hasher
 
 router = APIRouter()
 
-@router.get("/me", response_model=TeacherOut)
-def me(current_user = Depends(get_current_user), db: Session = Depends(get_db)):
-    t = crud_teacher.get_teacher_by_user_id(db, current_user.id)
-    if not t:
-        raise HTTPException(status_code=404, detail="Teacher profile not found")
-    return t
 
 @router.post("/", response_model=TeacherOut)
-def create_teacher(payload: TeacherCreate, db: Session = Depends(get_db)):
-    return crud_teacher.create_teacher(db, payload)
+def create_teacher_with_user(payload: TeacherCreate, db: Session = Depends(get_db)):
+
+    # 1. Create User
+    password_hash = Hasher.get_password_hash(payload.user.password)
+
+    user = create_user(
+        db=db,
+        username=payload.user.username,
+        email=payload.user.email,
+        password_hash=password_hash,
+        first_name=payload.user.first_name,
+        last_name=payload.user.last_name,
+        role="teacher"
+    )
+
+    # 2. Create Teacher
+    teacher = create_teacher(
+        db=db,
+        user_id=user.id,
+        employee_id=payload.employee_id,
+        qualification=payload.qualification,
+        phone=payload.phone
+    )
+
+    return teacher

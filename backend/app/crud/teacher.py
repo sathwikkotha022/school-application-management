@@ -3,12 +3,18 @@ from sqlalchemy.orm import Session
 from app.models.teacher import Teacher
 from app.schemas.teacher import TeacherCreate, TeacherUpdate
 
-def create_teacher(db: Session, teacher: TeacherCreate):
-    db_teacher = Teacher(**teacher.dict())
-    db.add(db_teacher)
+def create_teacher(db: Session, user_id: int, employee_id: str, qualification: str = None, phone: str = None):
+    t = Teacher(
+        user_id=user_id,
+        employee_id=employee_id,
+        qualification=qualification,
+        phone=phone
+    )
+    db.add(t)
     db.commit()
-    db.refresh(db_teacher)
-    return db_teacher
+    db.refresh(t)
+    return t
+
 
 def get_teacher(db: Session, teacher_id: int):
     return db.query(Teacher).filter(Teacher.id == teacher_id).first()
