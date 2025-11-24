@@ -3,7 +3,11 @@ from sqlalchemy.orm import Session
 from app.models.teacher import Teacher
 from app.schemas.teacher import TeacherCreate, TeacherUpdate
 
-def create_teacher(db: Session, user_id: int, employee_id: str, qualification: str = None, phone: str = None):
+def create_teacher(db: Session, user_id: int,
+                   employee_id: str = None,
+                   qualification: str = None,
+                   phone: str = None,
+                   commit=True):
     t = Teacher(
         user_id=user_id,
         employee_id=employee_id,
@@ -11,8 +15,9 @@ def create_teacher(db: Session, user_id: int, employee_id: str, qualification: s
         phone=phone
     )
     db.add(t)
-    db.commit()
-    db.refresh(t)
+    if commit:
+        db.commit()
+        db.refresh(t)
     return t
 
 
