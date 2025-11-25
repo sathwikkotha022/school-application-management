@@ -7,8 +7,9 @@ from app import models
 from app.schemas import marks as marks_schemas
 from app.schemas import user as user_schemas
 from app.schemas import exam as exam_schemas
-from app.schemas.user import RegisterAdminIn
-from app.core.security import get_current_active_user
+from app.schemas.admin_user import RegisterAdminIn
+from app.core.security import get_current_active_user, hash_password
+from app.crud import user as crud_user
 
 router = APIRouter(prefix="/admin/academic", tags=["admin-academic"])
 
@@ -53,7 +54,7 @@ def create_admin(payload: RegisterAdminIn, db: Session = Depends(get_db), curren
     if crud_user.get_user_by_username(db, payload.username):
         raise HTTPException(status_code=400, detail="Username already taken")
 
-    hashed = security.hash_password(payload.password)
+    hashed = hash_password(payload.password)
 
     try:
         db.rollback()  # clear any lingering transaction state
