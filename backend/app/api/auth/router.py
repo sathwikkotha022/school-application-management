@@ -1,4 +1,3 @@
-# app/api/auth/router.py
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from pydantic import BaseModel, EmailStr, Field
@@ -31,6 +30,14 @@ class RegisterTeacherIn(BaseModel):
     employee_id: Optional[str] = None
     qualification: Optional[str] = None
     phone: Optional[str] = None
+
+
+class RegisterAdminIn(BaseModel):
+    username: str = Field(..., min_length=3)
+    email: EmailStr
+    password: str = Field(..., min_length=6)
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
 
 
 class LoginIn(BaseModel):
@@ -95,6 +102,8 @@ def register_teacher(payload: RegisterTeacherIn, db: Session = Depends(get_db)):
                                          last_name=payload.last_name,
                                          role="teacher",
                                          commit=False)
+            db.flush()  # flush to get user.id
+            db.refresh(user)  # ensure user.id is loaded
             teacher = crud_teacher.create_teacher(db,
                                                   user_id=user.id,
                                                   employee_id=payload.employee_id,

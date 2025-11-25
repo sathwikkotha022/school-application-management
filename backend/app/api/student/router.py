@@ -1,16 +1,22 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.schemas.student import StudentCreate, StudentOut
-from app.crud.student import create_student
-from app.crud.user import create_user
+from app.crud.student import create_student, get_student_by_user_id
+from app.crud.user import create_user, get_user_by_email, get_user_by_username
 from app.core.hashing import Hasher  # If you use hashing
+from app.core.security import get_current_student
 
 router = APIRouter()
 
 
 @router.post("/", response_model=StudentOut)
 def create_student_with_user(payload: StudentCreate, db: Session = Depends(get_db)):
+    # uniqueness checks
+    if get_user_by_email(db, payload.user.email):
+        raise HTTPException(status_code=400, detail="Email already registered")
+    if get_user_by_username(db, payload.user.username):
+        raise HTTPException(status_code=400, detail="Username already taken")
 
     # 1. Create User
     password_hash = Hasher.get_password_hash(payload.user.password)
@@ -34,4 +40,12 @@ def create_student_with_user(payload: StudentCreate, db: Session = Depends(get_d
         section_id=payload.section_id
     )
 
+    return student
+
+
+@router.get("/me", response_model=StudentOut)
+def get_my_profile(current_user=Depends(get_current_student), db: Session = Depends(get_db)):
+    student = get_student_by_user_id(db, current_user.id)
+    if not student:
+        raise HTTPException(status_code=404, detail="Student profile not found")
     return student

@@ -6,6 +6,8 @@ from app.database import get_db
 from app import models
 from app.schemas import marks as marks_schemas
 from app.schemas import user as user_schemas
+from app.schemas import exam as exam_schemas
+from app.schemas.user import RegisterAdminIn
 from app.core.security import get_current_active_user
 
 router = APIRouter(prefix="/admin/academic", tags=["admin-academic"])
@@ -41,3 +43,31 @@ def assign_teacher(teacher_id: int, subject_id: int, class_id: int, section_id: 
     obj = models.TeacherSubject(teacher_id=teacher_id, subject_id=subject_id, class_id=class_id, section_id=section_id)
     db.add(obj); db.commit(); db.refresh(obj)
     return {"id": obj.id}
+
+@router.post("/create-admin")
+def create_admin(payload: RegisterAdminIn, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_active_user)):
+    ensure_admin(current_user)
+    # uniqueness checks
+    if crud_user.get_user_by_email(db, payload.email):
+        raise HTTPException(status_code=400, detail="Email already registered")
+    if crud_user.get_user_by_username(db, payload.username):
+        raise HTTPException(status_code=400, detail="Username already taken")
+
+    hashed = security.hash_password(payload.password)
+
+    try:
+        db.rollback()  # clear any lingering transaction state
+        with db.begin():
+            user = crud_user.create_user(db,
+                                         username=payload.username,
+                                         email=payload.email,
+                                         password_hash=hashed,
+                                         first_name=payload.first_name,
+                                         last_name=payload.last_name,
+                                         role="admin",
+                                         commit=False)
+        return {"message": "admin created", "user_id": user.id}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Registration failed: {e}")

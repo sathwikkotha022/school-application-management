@@ -11,6 +11,7 @@ from passlib.context import CryptContext
 from app.core.config import settings
 from app.database import SessionLocal
 from app.models.user import User
+from app.core.roles import UserRole
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -110,3 +111,28 @@ def get_current_active_user(current_user: User = Depends(get_current_user)):
     if hasattr(current_user, "is_active") and not current_user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
+
+# =====================
+# ROLE-BASED ACCESS
+# =====================
+def role_required(*allowed_roles: UserRole):
+    def wrapper(current_user: User = Depends(get_current_user)):
+        if current_user.role not in allowed_roles:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You do not have permission to perform this action."
+            )
+        return current_user
+    return wrapper
+
+# --- Advanced RBAC wrappers ---
+super_admin_only = role_required(UserRole.SUPER_ADMIN)
+
+admin_or_super_admin = role_required(
+    UserRole.SUPER_ADMIN,
+    UserRole.ADMIN
+)
+
+teacher_only = role_required(UserRole.TEACHER)
+
+student_only = role_required(UserRole.STUDENT)

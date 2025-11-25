@@ -8,7 +8,7 @@ from app import models
 from app.schemas import marks as marks_schema
 from app.crud import marks as crud_marks
 
-router = APIRouter(prefix="/marks", tags=["student-marks"])
+router = APIRouter(tags=["student-marks"])
 
 def ensure_student_or_admin(user: models.User):
     if user.role not in ["student", "admin"]:

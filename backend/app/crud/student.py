@@ -15,3 +15,7 @@ def create_student(db: Session, user_id: int, roll_number: str,
         db.commit()
         db.refresh(student)
     return student
+
+
+def get_student_by_user_id(db: Session, user_id: int):
+    return db.query(Student).filter(Student.user_id == user_id).first()
