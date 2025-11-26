@@ -1,5 +1,5 @@
 # app/crud/teacher_classes.py
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from typing import List, Dict
 from app import models
 
@@ -7,10 +7,11 @@ def get_teacher_classes(db: Session, teacher_id: int) -> List[Dict]:
     results = []
 
     # 1. Direct mapping table
-    if hasattr(models, "TeacherClass"):
+    if hasattr(models, "TeacherSubject"):
         mapping = (
-            db.query(models.TeacherClass)
-            .filter(models.TeacherClass.teacher_id == teacher_id)
+            db.query(models.TeacherSubject)
+            .options(joinedload(models.TeacherSubject.school_class), joinedload(models.TeacherSubject.section), joinedload(models.TeacherSubject.subject))
+            .filter(models.TeacherSubject.teacher_id == teacher_id)
             .all()
         )
 

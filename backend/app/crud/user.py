@@ -30,3 +30,6 @@ def get_user_by_username(db: Session, username: str):
 
 def get_all_users(db: Session, skip: int = 0, limit: int = 100):
     return db.query(User).offset(skip).limit(limit).all()
+
+def get_admin_exists(db: Session):
+    return db.query(User).filter(User.role == "admin").first() is not None

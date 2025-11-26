@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.database import get_db
-from app.schemas.teacher import TeacherCreate, TeacherOut
+from app.schemas.teacher import TeacherCreate, TeacherOut, TeacherCreateFromUserId
 from app.crud.teacher import create_teacher
 from app.crud.user import create_user
 from app.core.hashing import Hasher

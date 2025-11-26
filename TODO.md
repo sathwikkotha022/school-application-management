@@ -1,3 +1,0 @@
-- [x] Move RegisterAdminIn to backend/app/schemas/admin_user.py
-- [x] Update import in backend/app/api/admin/academic.py and add missing imports
-- [ ] Test server startup

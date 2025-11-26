@@ -19,3 +19,6 @@ def create_student(db: Session, user_id: int, roll_number: str,
 
 def get_student_by_user_id(db: Session, user_id: int):
     return db.query(Student).filter(Student.user_id == user_id).first()
+
+def get_student(db: Session, student_id: int):
+    return db.query(Student).filter(Student.id == student_id).first()

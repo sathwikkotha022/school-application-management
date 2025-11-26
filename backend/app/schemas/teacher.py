@@ -17,6 +17,13 @@ class TeacherCreate(BaseModel):
     user: TeacherUserCreate
 
 
+class TeacherCreateFromUserId(BaseModel):
+    user_id: int
+    employee_id: Optional[str] = None
+    qualification: Optional[str] = None
+    phone: Optional[str] = None
+
+
 class TeacherUpdate(BaseModel):
     employee_id: Optional[str] = None
     qualification: Optional[str] = None

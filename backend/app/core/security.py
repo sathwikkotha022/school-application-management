@@ -88,10 +88,14 @@ def get_current_user(token: str = Depends(oauth2_scheme), db=Depends(get_db)):
 # ROLE-BASED ACCESS
 # =====================
 
-def get_current_teacher(current_user: User = Depends(get_current_user)):
+def get_current_teacher(current_user: User = Depends(get_current_user), db=Depends(get_db)):
     if current_user.role != "teacher":
         raise HTTPException(status_code=403, detail="Teachers only")
-    return current_user
+    from app.crud.teacher import get_teacher_by_user_id
+    teacher = get_teacher_by_user_id(db, current_user.id)
+    if not teacher:
+        raise HTTPException(status_code=404, detail="Teacher profile not found")
+    return teacher
 
 
 def get_current_student(current_user: User = Depends(get_current_user)):

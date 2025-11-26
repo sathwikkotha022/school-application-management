@@ -18,6 +18,7 @@ from app.api.teacher.router import router as teacher_router
 from app.api.teacher.marks import router as teacher_marks_router
 from app.api.teacher.classes import router as teacher_classes_router
 from app.api.teacher.attendance import router as teacher_attendance_router
+from app.api.teacher.teacher_subjects import router as teacher_subjects_router
 
 router = APIRouter()
 

@@ -14,3 +14,5 @@ class TeacherSubject(Base):
 
     teacher = relationship("Teacher", back_populates="teacher_subjects")
     subject = relationship("Subject", back_populates="teacher_subjects")
+    school_class = relationship("SchoolClass")
+    section = relationship("Section")
