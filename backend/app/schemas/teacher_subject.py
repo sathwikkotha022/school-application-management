@@ -13,6 +13,6 @@ class TeacherSubjectCreate(TeacherSubjectBase):
 
 class TeacherSubjectOut(TeacherSubjectBase):
     id: int
-    created_at: Optional[datetime]
+    created_at: datetime
 
     model_config = {"from_attributes": True}

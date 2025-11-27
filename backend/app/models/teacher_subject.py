@@ -1,7 +1,8 @@
 # app/models/teacher_subject.py
-from sqlalchemy import Column, Integer, ForeignKey
+from sqlalchemy import Column, Integer, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 from app.database import Base
+from datetime import datetime
 
 class TeacherSubject(Base):
     __tablename__ = "teacher_subjects"
@@ -11,6 +12,7 @@ class TeacherSubject(Base):
     subject_id = Column(Integer, ForeignKey("subjects.id"), nullable=False)
     class_id = Column(Integer, ForeignKey("school_classes.id"), nullable=True)
     section_id = Column(Integer, ForeignKey("sections.id"), nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
 
     teacher = relationship("Teacher", back_populates="teacher_subjects")
     subject = relationship("Subject", back_populates="teacher_subjects")

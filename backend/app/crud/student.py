@@ -22,3 +22,6 @@ def get_student_by_user_id(db: Session, user_id: int):
 
 def get_student(db: Session, student_id: int):
     return db.query(Student).filter(Student.id == student_id).first()
+
+def get_students_by_class_section(db: Session, class_id: int, section_id: int):
+    return db.query(Student).filter(Student.class_id == class_id, Student.section_id == section_id).all()

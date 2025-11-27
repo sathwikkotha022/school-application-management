@@ -77,6 +77,21 @@ def teacher_logout(
         raise HTTPException(status_code=404, detail="Attendance record not found")
     return ta
 
+@router.post("/assign", response_model=List[sa_schemas.StudentAttendanceOut])
+def assign_student_attendance(
+    payload: sa_schemas.StudentAttendanceAssign,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_active_user)
+):
+    ensure_teacher(current_user)
+
+    # Override teacher_id if current user is a teacher
+    if current_user.role == "teacher" and current_user.teacher:
+        payload.teacher_id = current_user.teacher.id
+
+    created = crud_sa.assign_student_attendance_for_class(db, payload)
+    return created
+
 @router.get("/my", response_model=List[ta_schemas.TeacherAttendanceOut])
 def get_my_attendance(
     skip: int = 0,

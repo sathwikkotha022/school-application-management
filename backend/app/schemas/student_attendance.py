@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from datetime import date
 from typing import Optional
 
@@ -27,3 +27,13 @@ class StudentAttendanceOut(StudentAttendanceBase):
 
     class Config:
         from_attributes : True
+
+class StudentAttendanceAssign(BaseModel):
+    teacher_id: int
+    subject_id: int
+    class_id: int
+    section_id: int
+    attendance_date: date = Field(default_factory=date.today)
+    period: int = Field(default=1)
+    status: str = Field(default="PRESENT")  # Default to PRESENT
+    remarks: Optional[str] = None
